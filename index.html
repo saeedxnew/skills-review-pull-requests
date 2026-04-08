@@ -1,179 +1,626 @@
-<title>Tic Tac Toe</title>
-<meta charset="UTF-8" />
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tic Tac Toe Arena</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap");
 
-<style>
-  body,
-  td,
-  input,
-  button {
-    font-size: 24px;
-    line-height: 1.5;
-    text-align: center;
-    font-family: system-ui, sans-serif;
-  }
-  td {
-    height: 3rem;
-    width: 3rem;
-    text-align: center;
-  }
-  table {
-    margin: 5rem auto;
-  }
-  @media (prefers-color-scheme: dark) {
-    body,
-    input {
-      background: #222;
-      color: #ccc;
-    }
-  }
-</style>
-
-<h1>Tic Tac Toe</h1>
-
-<table>
-  <tr>
-    <td><input type="checkbox" /></td>
-    <td><input type="checkbox" /></td>
-    <td><input type="checkbox" /></td>
-  </tr>
-  <tr>
-    <td><input type="checkbox" /></td>
-    <td><input type="checkbox" /></td>
-    <td><input type="checkbox" /></td>
-  </tr>
-  <tr>
-    <td><input type="checkbox" /></td>
-    <td><input type="checkbox" /></td>
-    <td><input type="checkbox" /></td>
-  </tr>
-</table>
-
-<h2 hidden>Game over, click “Play again” to play again 🧑‍💻 🤖!</h2>
-<button id="play-again" hidden>Play again</button>
-
-<script>
-  // Initialization
-  const boxes = Array.from(document.querySelectorAll("td"));
-  const inputs = Array.from(document.querySelectorAll("[type=checkbox]"));
-  const rows = [1, 2, 3].map((n) =>
-    Array.from(document.querySelectorAll(`tr:nth-child(${n}) td`))
-  );
-  const columns = [1, 2, 3].map((n) =>
-    Array.from(document.querySelectorAll(`td:nth-child(${n})`))
-  );
-  const diagonals = [
-    [
-      [1, 1],
-      [2, 2],
-      [3, 3],
-    ],
-    [
-      [3, 1],
-      [2, 2],
-      [1, 3],
-    ],
-  ].map((set) =>
-    set.map(([x, y]) =>
-      document.querySelector(`tr:nth-child(${x}) td:nth-child(${y})`)
-    )
-  );
-  const gameOver = document.querySelector("h2");
-  const playAgainBtn = document.getElementById("play-again");
-  const HUMAN = "🧑‍💻";
-  const ROBOT = "🤖";
-
-  // Decide who goes first
-  if (Math.random() > 0.5) {
-    runRobotTurn();
-  }
-
-  // Handle when a user clicks an input
-  for (const input of inputs) {
-    input.addEventListener("click", handleClickInput);
-  }
-
-  // Play again: reload the page to reset state
-  playAgainBtn.addEventListener("click", () => window.location.reload());
-
-  // The user chose a box, check for win, robot turn, check for win
-  function handleClickInput(evt) {
-    evt.target.closest("td").innerHTML = HUMAN;
-    if (hasWin()) {
-      return endGame("human");
-    }
-    if (hasDraw()) {
-      return endGame("draw");
-    }
-    runRobotTurn();
-    if (hasWin()) {
-      return endGame("robot");
-    }
-    if (hasDraw()) {
-      return endGame("draw");
-    }
-  }
-
-  // Choose a random available box
-  function runRobotTurn() {
-    const robotBoxes = shuffle(boxes);
-    while (robotBoxes.length) {
-      const box = robotBoxes.shift();
-      if (box.querySelector("input")) {
-        box.innerHTML = ROBOT;
-        break;
+      :root {
+        --ink: #0f172a;
+        --muted: #5b6473;
+        --surface: rgba(255, 255, 255, 0.9);
+        --border: rgba(15, 23, 42, 0.08);
+        --accent: #2563eb;
+        --accent-strong: #1d4ed8;
+        --shadow: 0 18px 60px rgba(15, 23, 42, 0.12);
+        --grid-line: rgba(15, 23, 42, 0.08);
       }
-    }
-  }
 
-  // Determine win
-  function hasWin() {
-    return (
-      rows.some(hasAllSame) ||
-      columns.some(hasAllSame) ||
-      diagonals.some(hasAllSame)
-    );
-  }
+      * {
+        box-sizing: border-box;
+      }
 
-  // Determine draw (no more available inputs)
-  function hasDraw() {
-    return !document.querySelector("td input[type=checkbox]");
-  }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Space Grotesk", "Segoe UI", system-ui, -apple-system,
+          sans-serif;
+        color: var(--ink);
+        background: radial-gradient(circle at 20% 20%, #e0f2fe 0, #e0f2fe 12%, transparent 25%),
+          radial-gradient(circle at 80% 0%, #cbd5ff 0, #cbd5ff 14%, transparent 28%),
+          linear-gradient(135deg, #f8fafc, #eef2ff);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 18px 48px;
+      }
 
-  // Determine if every cell matches
-  function hasAllSame(arr) {
-    return arr.every(
-      (td) => !td.querySelector("input") && td.innerHTML === arr[0].innerHTML
-    );
-  }
+      .app {
+        width: min(960px, 96vw);
+      }
 
-  // Display game over, cancel events
-  function endGame(result) {
-    if (result === "draw") {
-      gameOver.textContent = "Game over, refresh to play again 🧑‍💻 🤖!: Draw";
-    } else if (result === "human") {
-      gameOver.textContent = "Game over, refresh to play again 🧑‍💻 🤖!: You win";
-    } else if (result === "robot") {
-      gameOver.textContent = "Game over, refresh to play again 🧑‍💻 🤖!: Robot wins";
-    }
-    gameOver.hidden = false;
-    playAgainBtn.hidden = false;
-    // Move focus to the button for quick replay
-    playAgainBtn.focus();
-    for (const input of inputs) {
-      input.removeEventListener("click", handleClickInput);
-      input.remove();
-    }
-  }
+      .hero {
+        text-align: center;
+        margin-bottom: 18px;
+      }
 
-  // Shuffle a copy of the input array
-  function shuffle(array) {
-    array = array.slice(0);
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * i);
-      const temp = array[i];
-      array[i] = array[j];
-      array[j] = temp;
-    }
-    return array;
-  }
-</script>
+      .hero .eyebrow {
+        display: inline-flex;
+        gap: 8px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: rgba(37, 99, 235, 0.1);
+        color: var(--accent);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-size: 12px;
+      }
+
+      .hero h1 {
+        margin: 12px 0 6px;
+        font-size: clamp(28px, 4vw, 36px);
+        letter-spacing: -0.02em;
+      }
+
+      .hero .lede {
+        margin: 0;
+        color: var(--muted);
+        font-size: 16px;
+      }
+
+      .panel {
+        background: var(--surface);
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+        padding: clamp(18px, 3vw, 28px);
+        backdrop-filter: blur(6px);
+      }
+
+      .controls {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px;
+        align-items: end;
+      }
+
+      .control {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .label {
+        font-size: 13px;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      .options {
+        display: inline-flex;
+        gap: 10px;
+        background: #f1f5f9;
+        padding: 8px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+      }
+
+      .options label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: var(--muted);
+        font-weight: 600;
+      }
+
+      .options input[type="radio"] {
+        accent-color: var(--accent);
+        width: 16px;
+        height: 16px;
+      }
+
+      .options label:hover {
+        background: white;
+        color: var(--ink);
+        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+      }
+
+      .status {
+        font-weight: 600;
+        color: var(--ink);
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px dashed var(--border);
+        background: #f8fafc;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+      }
+
+      .actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      button {
+        font-family: inherit;
+      }
+
+      .primary {
+        background: linear-gradient(120deg, var(--accent), var(--accent-strong));
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 12px 18px;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 12px 24px rgba(37, 99, 235, 0.25);
+        transition: transform 0.08s ease, box-shadow 0.2s ease;
+      }
+
+      .primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 16px 30px rgba(37, 99, 235, 0.28);
+      }
+
+      .primary:active {
+        transform: translateY(0);
+      }
+
+      .legends {
+        display: flex;
+        gap: 10px;
+        margin: 14px 0 4px;
+        color: var(--muted);
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .legend {
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+        padding: 6px 10px;
+        border-radius: 10px;
+        background: #f8fafc;
+        border: 1px solid var(--border);
+      }
+
+      .legend.human::before,
+      .legend.robot::before {
+        content: "";
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        display: inline-block;
+      }
+
+      .legend.human::before {
+        background: #0ea5e9;
+      }
+      .legend.robot::before {
+        background: #f97316;
+      }
+
+      .board {
+        margin-top: 16px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        padding: 12px;
+        background: #f8fafc;
+        border-radius: 16px;
+        border: 1px solid var(--grid-line);
+      }
+
+      .cell {
+        aspect-ratio: 1 / 1;
+        border-radius: 14px;
+        background: white;
+        border: 1px solid var(--grid-line);
+        font-size: clamp(32px, 7vw, 40px);
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.16s ease;
+        color: var(--ink);
+      }
+
+      .cell:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+      }
+
+      .cell:disabled {
+        cursor: default;
+        box-shadow: none;
+        transform: none;
+      }
+
+      .cell--human {
+        color: #0ea5e9;
+      }
+
+      .cell--robot {
+        color: #f97316;
+      }
+
+      .cell--win {
+        background: rgba(37, 99, 235, 0.08);
+        border-color: rgba(37, 99, 235, 0.3);
+        box-shadow: 0 10px 22px rgba(37, 99, 235, 0.2);
+      }
+
+      .cell--muted {
+        opacity: 0.18;
+      }
+
+      .message {
+        margin-top: 14px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: #f1f5f9;
+        border: 1px solid var(--border);
+        color: var(--ink);
+        font-weight: 600;
+      }
+
+      @media (max-width: 600px) {
+        .options {
+          flex-wrap: wrap;
+        }
+        .board {
+          gap: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <header class="hero">
+        <p class="eyebrow">Tic Tac Toe</p>
+        <h1>Challenge the Robot</h1>
+        <p class="lede">
+          Pick a difficulty, claim a line of three, and race the bot to victory.
+        </p>
+      </header>
+
+      <section class="panel" aria-label="Game controls and board">
+        <div class="controls">
+          <div class="control">
+            <span class="label">Difficulty</span>
+            <div class="options" role="group" aria-label="Select difficulty">
+              <label>
+                <input type="radio" name="difficulty" value="easy" />
+                Easy
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="difficulty"
+                  value="medium"
+                  checked
+                />
+                Medium
+              </label>
+              <label>
+                <input type="radio" name="difficulty" value="hard" />
+                Hard
+              </label>
+            </div>
+          </div>
+
+          <div class="control">
+            <span class="label">Status</span>
+            <div id="status" class="status">Setting the board…</div>
+          </div>
+
+          <div class="control">
+            <span class="label">Actions</span>
+            <div class="actions">
+              <button id="reset" class="primary" type="button">New Game</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="legends" aria-hidden="true">
+          <span class="legend human">You — X</span>
+          <span class="legend robot">Robot — O</span>
+        </div>
+
+        <div
+          class="board"
+          role="grid"
+          aria-label="Tic tac toe board, three by three"
+        >
+          <button class="cell" data-index="0" aria-label="Cell 1" role="gridcell"></button>
+          <button class="cell" data-index="1" aria-label="Cell 2" role="gridcell"></button>
+          <button class="cell" data-index="2" aria-label="Cell 3" role="gridcell"></button>
+          <button class="cell" data-index="3" aria-label="Cell 4" role="gridcell"></button>
+          <button class="cell" data-index="4" aria-label="Cell 5" role="gridcell"></button>
+          <button class="cell" data-index="5" aria-label="Cell 6" role="gridcell"></button>
+          <button class="cell" data-index="6" aria-label="Cell 7" role="gridcell"></button>
+          <button class="cell" data-index="7" aria-label="Cell 8" role="gridcell"></button>
+          <button class="cell" data-index="8" aria-label="Cell 9" role="gridcell"></button>
+        </div>
+
+        <div class="message" id="message">
+          First to align three wins. You are X, the robot is O.
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const HUMAN = "X";
+      const ROBOT = "O";
+      const winningLines = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6],
+      ];
+
+      const cells = Array.from(document.querySelectorAll(".cell"));
+      const statusEl = document.getElementById("status");
+      const messageEl = document.getElementById("message");
+      const resetBtn = document.getElementById("reset");
+      const difficultyInputs = Array.from(
+        document.querySelectorAll("input[name=difficulty]")
+      );
+
+      const baseMessage =
+        "First to align three wins. You are X, the robot is O.";
+      let board = Array(9).fill(null);
+      let currentPlayer = HUMAN;
+      let gameOver = false;
+      let difficulty = getSelectedDifficulty();
+
+      difficultyInputs.forEach((input) =>
+        input.addEventListener("change", () => {
+          difficulty = getSelectedDifficulty();
+          messageEl.textContent = `Difficulty set to ${capitalize(
+            difficulty
+          )}. Starting a fresh round.`;
+          startNewGame(true, true);
+        })
+      );
+
+      cells.forEach((cell) =>
+        cell.addEventListener("click", () =>
+          handleHumanMove(Number(cell.dataset.index))
+        )
+      );
+
+      resetBtn.addEventListener("click", () => startNewGame(true));
+
+      function startNewGame(resetStatus, keepExistingMessage = false) {
+        board = Array(9).fill(null);
+        gameOver = false;
+        cells.forEach((cell, idx) => {
+          cell.textContent = "";
+          cell.disabled = false;
+          cell.className = "cell";
+          cell.setAttribute("aria-label", `Cell ${idx + 1}`);
+        });
+
+        currentPlayer = Math.random() > 0.5 ? ROBOT : HUMAN;
+        updateStatus(
+          resetStatus
+            ? currentPlayer === HUMAN
+              ? "Your move first."
+              : "Robot starts this round."
+            : undefined
+        );
+        messageEl.textContent = keepExistingMessage
+          ? messageEl.textContent
+          : baseMessage;
+
+        if (currentPlayer === ROBOT) {
+          setTimeout(robotMove, 420);
+        }
+      }
+
+      function getSelectedDifficulty() {
+        const selected = difficultyInputs.find((input) => input.checked);
+        return selected ? selected.value : "medium";
+      }
+
+      function handleHumanMove(index) {
+        if (gameOver || currentPlayer !== HUMAN || board[index]) return;
+        placeMark(index, HUMAN);
+        if (handleAfterMove()) return;
+        currentPlayer = ROBOT;
+        updateStatus();
+        setTimeout(robotMove, 420);
+      }
+
+      function robotMove() {
+        if (gameOver || currentPlayer !== ROBOT) return;
+        const move = pickMove();
+        if (move === null) return;
+        placeMark(move, ROBOT);
+        if (handleAfterMove()) return;
+        currentPlayer = HUMAN;
+        updateStatus();
+      }
+
+      function placeMark(index, player) {
+        board[index] = player;
+        const cell = cells[index];
+        cell.textContent = player;
+        cell.classList.add(player === HUMAN ? "cell--human" : "cell--robot");
+        cell.disabled = true;
+      }
+
+      function handleAfterMove() {
+        const winner = findWinner();
+        if (winner) {
+          finishGame(winner.player, winner.line);
+          return true;
+        }
+        if (board.every(Boolean)) {
+          finishDraw();
+          return true;
+        }
+        return false;
+      }
+
+      function findWinner(state = board) {
+        for (const line of winningLines) {
+          const [a, b, c] = line;
+          if (state[a] && state[a] === state[b] && state[a] === state[c]) {
+            return { player: state[a], line };
+          }
+        }
+        return null;
+      }
+
+      function finishGame(player, line) {
+        gameOver = true;
+        const winnerText = player === HUMAN ? "You win!" : "Robot wins.";
+        updateStatus(winnerText);
+        messageEl.textContent = `${winnerText} Press “New Game” to play again.`;
+
+        cells.forEach((cell, idx) => {
+          cell.disabled = true;
+          if (line.includes(idx)) {
+            cell.classList.add("cell--win");
+          } else {
+            cell.classList.add("cell--muted");
+            cell.textContent = "";
+          }
+        });
+      }
+
+      function finishDraw() {
+        gameOver = true;
+        updateStatus("It's a draw.");
+        messageEl.textContent = "Nobody found a line. Try again!";
+      }
+
+      function updateStatus(explicitText) {
+        if (explicitText) {
+          statusEl.textContent = explicitText;
+          return;
+        }
+        statusEl.textContent =
+          currentPlayer === HUMAN ? "Your turn — tap a cell." : "Robot thinking…";
+      }
+
+      function pickMove() {
+        const available = getAvailableMoves(board);
+        if (!available.length) return null;
+
+        if (difficulty === "easy") {
+          return pickRandom(available);
+        }
+        if (difficulty === "medium") {
+          return pickMediumMove(available);
+        }
+        return pickHardMove();
+      }
+
+      function getAvailableMoves(state) {
+        const moves = [];
+        for (let i = 0; i < state.length; i++) {
+          if (!state[i]) moves.push(i);
+        }
+        return moves;
+      }
+
+      function pickRandom(options) {
+        return options[Math.floor(Math.random() * options.length)];
+      }
+
+      function pickMediumMove(available) {
+        const winningMove = findCriticalMove(ROBOT);
+        if (winningMove !== null) return winningMove;
+        const blockMove = findCriticalMove(HUMAN);
+        if (blockMove !== null) return blockMove;
+
+        if (board[4] === null) return 4;
+
+        const corners = [0, 2, 6, 8].filter((idx) => board[idx] === null);
+        if (corners.length) return pickRandom(corners);
+
+        return pickRandom(available);
+      }
+
+      function findCriticalMove(player) {
+        for (const line of winningLines) {
+          const [a, b, c] = line;
+          const values = [board[a], board[b], board[c]];
+          const owned = values.filter((v) => v === player).length;
+          const emptyIndex = line.find((index) => board[index] === null);
+          if (owned === 2 && emptyIndex !== undefined) {
+            return emptyIndex;
+          }
+        }
+        return null;
+      }
+
+      function pickHardMove() {
+        const available = getAvailableMoves(board);
+        let bestScore = -Infinity;
+        let move = available[0];
+
+        for (const idx of available) {
+          board[idx] = ROBOT;
+          const score = minimax(board, 0, false);
+          board[idx] = null;
+          if (score > bestScore) {
+            bestScore = score;
+            move = idx;
+          }
+        }
+        return move;
+      }
+
+      function minimax(state, depth, isMaximizing) {
+        const winner = findWinner(state);
+        if (winner) {
+          return winner.player === ROBOT ? 10 - depth : depth - 10;
+        }
+        const available = getAvailableMoves(state);
+        if (!available.length) return 0;
+
+        if (isMaximizing) {
+          let best = -Infinity;
+          for (const idx of available) {
+            state[idx] = ROBOT;
+            best = Math.max(best, minimax(state, depth + 1, false));
+            state[idx] = null;
+          }
+          return best;
+        }
+
+        let best = Infinity;
+        for (const idx of available) {
+          state[idx] = HUMAN;
+          best = Math.min(best, minimax(state, depth + 1, true));
+          state[idx] = null;
+        }
+        return best;
+      }
+
+      function capitalize(value) {
+        return value.charAt(0).toUpperCase() + value.slice(1);
+      }
+
+      startNewGame();
+    </script>
+  </body>
+</html>

@@ -463,9 +463,10 @@
     <script>
       var HUMAN      = "X";
       var ROBOT      = "O";
-      var MAX_MARKS  = 3;
-      var MAX_MOVES  = 30;
-      var ROBOT_DELAY = 480;
+      var MAX_MARKS        = 3;
+      var MAX_MOVES        = 30;
+      var MAX_MINIMAX_DEPTH = 7;
+      var ROBOT_DELAY      = 480;
 
       var winningLines = [
         [0, 1, 2], [3, 4, 5], [6, 7, 8],
@@ -654,10 +655,10 @@
 
         if (isHuman) {
           scores.human++;
-          setMessage("Excellent! You aligned three. Press “New Game” to continue.", "");
+          setMessage("Excellent! You aligned three. Press "New Game" to continue.", "");
         } else {
           scores.robot++;
-          setMessage("The robot got three in a row. Press “New Game” to try again.", "");
+          setMessage("The robot got three in a row. Press "New Game" to try again.", "");
         }
 
         bumpScore(isHuman ? "human" : "robot");
@@ -724,7 +725,7 @@
         var el = type === "human" ? scoreHumanEl :
                  type === "robot" ? scoreRobotEl  : scoreDrawEl;
         el.classList.remove("score-bump");
-        void el.offsetWidth;
+        void el.offsetWidth; // Force reflow so the CSS animation restarts
         el.classList.add("score-bump");
       }
 
@@ -787,7 +788,7 @@
         var winner = findWinner(state);
         if (winner) return winner.player === ROBOT ? 10 - depth : depth - 10;
         var available = getAvailableMoves(state);
-        if (!available.length || depth >= 7) return 0;
+        if (!available.length || depth >= MAX_MINIMAX_DEPTH) return 0;
 
         if (isMaximizing) {
           var best = -Infinity;

@@ -5,31 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Tic Tac Toe Arena</title>
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap");
+      @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
 
       :root {
         --ink: #0f172a;
         --muted: #5b6473;
-        --surface: rgba(255, 255, 255, 0.9);
+        --surface: rgba(255, 255, 255, 0.92);
         --border: rgba(15, 23, 42, 0.08);
         --accent: #2563eb;
         --accent-strong: #1d4ed8;
+        --human: #0ea5e9;
+        --robot: #f97316;
         --shadow: 0 18px 60px rgba(15, 23, 42, 0.12);
         --grid-line: rgba(15, 23, 42, 0.08);
       }
 
-      * {
-        box-sizing: border-box;
-      }
+      * { box-sizing: border-box; }
 
       body {
         margin: 0;
         min-height: 100vh;
-        font-family: "Space Grotesk", "Segoe UI", system-ui, -apple-system,
-          sans-serif;
+        font-family: "Space Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif;
         color: var(--ink);
-        background: radial-gradient(circle at 20% 20%, #e0f2fe 0, #e0f2fe 12%, transparent 25%),
-          radial-gradient(circle at 80% 0%, #cbd5ff 0, #cbd5ff 14%, transparent 28%),
+        background:
+          radial-gradient(circle at 20% 20%, #e0f2fe 0, #e0f2fe 12%, transparent 25%),
+          radial-gradient(circle at 80% 0%,  #cbd5ff 0, #cbd5ff 14%, transparent 28%),
           linear-gradient(135deg, #f8fafc, #eef2ff);
         display: flex;
         align-items: center;
@@ -37,19 +37,15 @@
         padding: 32px 18px 48px;
       }
 
-      .app {
-        width: min(960px, 96vw);
-      }
+      .app { width: min(960px, 96vw); }
 
-      .hero {
-        text-align: center;
-        margin-bottom: 18px;
-      }
+      /* Hero */
+      .hero { text-align: center; margin-bottom: 18px; }
 
       .hero .eyebrow {
         display: inline-flex;
         gap: 8px;
-        padding: 6px 12px;
+        padding: 6px 14px;
         border-radius: 999px;
         background: rgba(37, 99, 235, 0.1);
         color: var(--accent);
@@ -65,12 +61,52 @@
         letter-spacing: -0.02em;
       }
 
-      .hero .lede {
-        margin: 0;
-        color: var(--muted);
-        font-size: 16px;
+      .hero .lede { margin: 0; color: var(--muted); font-size: 15px; }
+
+      /* Score board */
+      .scoreboard {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin: 16px 0 0;
       }
 
+      .score-card {
+        padding: 10px 22px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: white;
+        text-align: center;
+        min-width: 82px;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+      }
+
+      .score-card .score-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 700;
+        color: var(--muted);
+      }
+
+      .score-card .score-value {
+        font-size: 30px;
+        font-weight: 700;
+        line-height: 1.15;
+      }
+
+      .score-card.human .score-value { color: var(--human); }
+      .score-card.robot .score-value { color: var(--robot); }
+      .score-card.draw  .score-value { color: var(--muted); }
+
+      .score-bump { animation: bump 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+      @keyframes bump {
+        from { transform: scale(1.4); }
+        to   { transform: scale(1);   }
+      }
+
+      /* Panel */
       .panel {
         background: var(--surface);
         border-radius: 18px;
@@ -87,11 +123,7 @@
         align-items: end;
       }
 
-      .control {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-      }
+      .control { display: flex; flex-direction: column; gap: 6px; }
 
       .label {
         font-size: 13px;
@@ -101,59 +133,82 @@
         font-weight: 700;
       }
 
+      /* Difficulty toggle */
       .options {
         display: inline-flex;
-        gap: 10px;
+        gap: 6px;
         background: #f1f5f9;
-        padding: 8px;
+        padding: 6px;
         border-radius: 12px;
         border: 1px solid var(--border);
+      }
+
+      .options input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+        pointer-events: none;
       }
 
       .options label {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        padding: 6px 10px;
-        border-radius: 10px;
+        gap: 5px;
+        padding: 7px 14px;
+        border-radius: 9px;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.18s ease;
         color: var(--muted);
         font-weight: 600;
-      }
-
-      .options input[type="radio"] {
-        accent-color: var(--accent);
-        width: 16px;
-        height: 16px;
+        font-size: 14px;
+        user-select: none;
       }
 
       .options label:hover {
         background: white;
         color: var(--ink);
-        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
       }
 
+      .options input[value="easy"]:checked   + label { background: #dcfce7; color: #15803d; box-shadow: 0 2px 8px rgba(21,128,61,0.15); }
+      .options input[value="medium"]:checked + label { background: #fef9c3; color: #a16207; box-shadow: 0 2px 8px rgba(161,98,7,0.15); }
+      .options input[value="hard"]:checked   + label { background: #fee2e2; color: #b91c1c; box-shadow: 0 2px 8px rgba(185,28,28,0.15); }
+
+      /* Status bar */
       .status {
         font-weight: 600;
         color: var(--ink);
-        padding: 12px 14px;
+        padding: 11px 14px;
         border-radius: 12px;
         border: 1px dashed var(--border);
         background: #f8fafc;
         min-height: 48px;
         display: flex;
         align-items: center;
+        gap: 9px;
+        font-size: 14px;
       }
 
-      .actions {
-        display: flex;
-        gap: 8px;
+      .status-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+        background: var(--accent);
+        flex-shrink: 0;
+        transition: background 0.2s;
       }
 
-      button {
-        font-family: inherit;
+      .status-dot.thinking { animation: blink 0.9s ease-in-out infinite; }
+
+      @keyframes blink {
+        0%, 100% { opacity: 1;    }
+        50%       { opacity: 0.15; }
       }
+
+      /* Buttons */
+      .actions { display: flex; gap: 8px; }
+      button { font-family: inherit; }
 
       .primary {
         background: linear-gradient(120deg, var(--accent), var(--accent-strong));
@@ -168,21 +223,30 @@
         transition: transform 0.08s ease, box-shadow 0.2s ease;
       }
 
-      .primary:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 16px 30px rgba(37, 99, 235, 0.28);
+      .primary:hover  { transform: translateY(-1px); box-shadow: 0 16px 30px rgba(37,99,235,0.28); }
+      .primary:active { transform: translateY(0); }
+
+      .secondary {
+        background: #f1f5f9;
+        color: var(--muted);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px 14px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s ease;
       }
 
-      .primary:active {
-        transform: translateY(0);
-      }
+      .secondary:hover { background: #e2e8f0; color: var(--ink); }
 
+      /* Legends */
       .legends {
         display: flex;
+        flex-wrap: wrap;
         gap: 10px;
         margin: 14px 0 4px;
-        color: var(--muted);
-        font-weight: 600;
+        align-items: center;
         font-size: 14px;
       }
 
@@ -194,6 +258,8 @@
         border-radius: 10px;
         background: #f8fafc;
         border: 1px solid var(--border);
+        font-weight: 600;
+        color: var(--muted);
       }
 
       .legend.human::before,
@@ -203,22 +269,21 @@
         height: 10px;
         border-radius: 999px;
         display: inline-block;
+        flex-shrink: 0;
       }
 
-      .legend.human::before {
-        background: #0ea5e9;
-      }
-      .legend.robot::before {
-        background: #f97316;
-      }
+      .legend.human::before { background: var(--human); }
+      .legend.robot::before { background: var(--robot); }
+      .legend-note { font-size: 12px; color: var(--muted); font-style: italic; }
 
+      /* Board */
       .board {
         margin-top: 16px;
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 12px;
         padding: 12px;
-        background: #f8fafc;
+        background: #f1f5f9;
         border-radius: 16px;
         border: 1px solid var(--grid-line);
       }
@@ -227,71 +292,116 @@
         aspect-ratio: 1 / 1;
         border-radius: 14px;
         background: white;
-        border: 1px solid var(--grid-line);
+        border: 1.5px solid var(--grid-line);
         font-size: clamp(32px, 7vw, 40px);
         font-weight: 700;
         cursor: pointer;
-        transition: all 0.16s ease;
+        transition: background 0.16s ease, box-shadow 0.16s ease, transform 0.1s ease,
+                    border-color 0.16s ease, opacity 0.16s ease;
         color: var(--ink);
       }
 
-      .cell:hover {
+      .cell:hover:not(:disabled) {
         transform: translateY(-2px);
-        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+        background: #f0f9ff;
       }
 
-      .cell:disabled {
-        cursor: default;
-        box-shadow: none;
-        transform: none;
-      }
+      .cell:disabled { cursor: default; box-shadow: none; transform: none; }
 
-      .cell--human {
-        color: #0ea5e9;
-      }
-
-      .cell--robot {
-        color: #f97316;
-      }
+      .cell--human { color: var(--human); }
+      .cell--robot { color: var(--robot); }
 
       .cell--win {
         background: rgba(37, 99, 235, 0.08);
-        border-color: rgba(37, 99, 235, 0.3);
+        border-color: rgba(37, 99, 235, 0.35) !important;
         box-shadow: 0 10px 22px rgba(37, 99, 235, 0.2);
       }
 
-      .cell--muted {
-        opacity: 0.18;
+      .cell--muted { opacity: 0.15; }
+
+      /* Oldest-mark indicator: dashed + pulse */
+      .cell--oldest {
+        border-style: dashed !important;
+        border-width: 2px !important;
+        animation: pulse-old 1.8s ease-in-out infinite;
       }
 
+      .cell--oldest.cell--human { border-color: var(--human) !important; }
+      .cell--oldest.cell--robot { border-color: var(--robot) !important; }
+
+      @keyframes pulse-old {
+        0%, 100% { opacity: 0.5; }
+        50%       { opacity: 0.9; }
+      }
+
+      /* Pop animations */
+      @keyframes pop-in {
+        0%   { transform: scale(0.55); opacity: 0; }
+        70%  { transform: scale(1.1);  }
+        100% { transform: scale(1);    opacity: 1; }
+      }
+
+      @keyframes pop-out {
+        0%   { transform: scale(1);   opacity: 1; }
+        100% { transform: scale(0.4); opacity: 0; }
+      }
+
+      .cell--appear { animation: pop-in  0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+      .cell--vanish { animation: pop-out 0.22s ease forwards; pointer-events: none; }
+
+      /* Message bar */
       .message {
         margin-top: 14px;
-        padding: 12px 14px;
+        padding: 12px 16px;
         border-radius: 12px;
-        background: #f1f5f9;
+        background: #f8fafc;
         border: 1px solid var(--border);
         color: var(--ink);
         font-weight: 600;
+        font-size: 14px;
       }
 
+      .message .hint {
+        display: block;
+        color: var(--muted);
+        font-weight: 500;
+        margin-top: 4px;
+        font-size: 13px;
+      }
+
+      /* Responsive */
       @media (max-width: 600px) {
-        .options {
-          flex-wrap: wrap;
-        }
-        .board {
-          gap: 10px;
-        }
+        .options    { flex-wrap: wrap; }
+        .board      { gap: 8px; }
+        .scoreboard { gap: 6px; }
+        .score-card { padding: 8px 12px; min-width: 68px; }
       }
     </style>
   </head>
   <body>
     <main class="app">
       <header class="hero">
-        <p class="eyebrow">Tic Tac Toe</p>
+        <p class="eyebrow">&#x2694;&#xFE0F; Tic Tac Toe Arena</p>
         <h1>Challenge the Robot</h1>
         <p class="lede">
-          Pick a difficulty, claim a line of three, and race the bot to victory.
+          Align three in a row &mdash; but each player keeps only their last <strong>3&nbsp;marks</strong>!
         </p>
+
+        <div class="scoreboard" aria-label="Score board">
+          <div class="score-card human" aria-label="Your score">
+            <div class="score-label">You</div>
+            <div class="score-value" id="score-human">0</div>
+          </div>
+          <div class="score-card draw" aria-label="Draws">
+            <div class="score-label">Draw</div>
+            <div class="score-value" id="score-draw">0</div>
+          </div>
+          <div class="score-card robot" aria-label="Robot score">
+            <div class="score-label">Robot</div>
+            <div class="score-value" id="score-robot">0</div>
+          </div>
+        </div>
       </header>
 
       <section class="panel" aria-label="Game controls and board">
@@ -299,49 +409,39 @@
           <div class="control">
             <span class="label">Difficulty</span>
             <div class="options" role="group" aria-label="Select difficulty">
-              <label>
-                <input type="radio" name="difficulty" value="easy" />
-                Easy
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="difficulty"
-                  value="medium"
-                  checked
-                />
-                Medium
-              </label>
-              <label>
-                <input type="radio" name="difficulty" value="hard" />
-                Hard
-              </label>
+              <input type="radio" name="difficulty" id="diff-easy"   value="easy" />
+              <label for="diff-easy">&#x1F7E2; Easy</label>
+              <input type="radio" name="difficulty" id="diff-medium" value="medium" checked />
+              <label for="diff-medium">&#x1F7E1; Medium</label>
+              <input type="radio" name="difficulty" id="diff-hard"   value="hard" />
+              <label for="diff-hard">&#x1F534; Hard</label>
             </div>
           </div>
 
           <div class="control">
             <span class="label">Status</span>
-            <div id="status" class="status">Setting the board…</div>
+            <div id="status" class="status" aria-live="polite">
+              <span class="status-dot" id="status-dot"></span>
+              <span id="status-text">Setting the board&hellip;</span>
+            </div>
           </div>
 
           <div class="control">
             <span class="label">Actions</span>
             <div class="actions">
-              <button id="reset" class="primary" type="button">New Game</button>
+              <button id="reset"        class="primary"   type="button">New Game</button>
+              <button id="reset-scores" class="secondary" type="button">Reset Scores</button>
             </div>
           </div>
         </div>
 
         <div class="legends" aria-hidden="true">
-          <span class="legend human">You — X</span>
-          <span class="legend robot">Robot — O</span>
+          <span class="legend human">You &mdash; X</span>
+          <span class="legend robot">Robot &mdash; O</span>
+          <span class="legend-note">&#x26A0; Dashed border = oldest mark (removed on next move)</span>
         </div>
 
-        <div
-          class="board"
-          role="grid"
-          aria-label="Tic tac toe board, three by three"
-        >
+        <div class="board" role="grid" aria-label="Tic tac toe board, three by three">
           <button class="cell" data-index="0" aria-label="Cell 1" role="gridcell"></button>
           <button class="cell" data-index="1" aria-label="Cell 2" role="gridcell"></button>
           <button class="cell" data-index="2" aria-label="Cell 3" role="gridcell"></button>
@@ -353,88 +453,112 @@
           <button class="cell" data-index="8" aria-label="Cell 9" role="gridcell"></button>
         </div>
 
-        <div class="message" id="message">
-          First to align three wins. You are X, the robot is O.
+        <div class="message" id="message" aria-live="polite">
+          <span id="message-main">First to align three wins. Each player keeps only their last 3 marks.</span>
+          <span class="hint" id="message-hint">The dashed mark will be removed when you place your next mark.</span>
         </div>
       </section>
     </main>
 
     <script>
-      const HUMAN = "X";
-      const ROBOT = "O";
-      const winningLines = [
-        [0, 1, 2],
-        [3, 4, 5],
-        [6, 7, 8],
-        [0, 3, 6],
-        [1, 4, 7],
-        [2, 5, 8],
-        [0, 4, 8],
-        [2, 4, 6],
+      var HUMAN      = "X";
+      var ROBOT      = "O";
+      var MAX_MARKS  = 3;
+      var MAX_MOVES  = 30;
+      var ROBOT_DELAY = 480;
+
+      var winningLines = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],
+        [0, 4, 8], [2, 4, 6]
       ];
 
-      const cells = Array.from(document.querySelectorAll(".cell"));
-      const statusEl = document.getElementById("status");
-      const messageEl = document.getElementById("message");
-      const resetBtn = document.getElementById("reset");
-      const difficultyInputs = Array.from(
-        document.querySelectorAll("input[name=difficulty]")
-      );
+      var cells            = Array.from(document.querySelectorAll(".cell"));
+      var statusDot        = document.getElementById("status-dot");
+      var statusText       = document.getElementById("status-text");
+      var messageMain      = document.getElementById("message-main");
+      var messageHint      = document.getElementById("message-hint");
+      var resetBtn         = document.getElementById("reset");
+      var resetScoresBtn   = document.getElementById("reset-scores");
+      var scoreHumanEl     = document.getElementById("score-human");
+      var scoreDrawEl      = document.getElementById("score-draw");
+      var scoreRobotEl     = document.getElementById("score-robot");
+      var difficultyInputs = Array.from(document.querySelectorAll("input[name=difficulty]"));
 
-      const baseMessage =
-        "First to align three wins. You are X, the robot is O.";
-      let board = Array(9).fill(null);
-      let currentPlayer = HUMAN;
-      let gameOver = false;
-      let difficulty = getSelectedDifficulty();
+      var board         = Array(9).fill(null);
+      var humanMoves    = [];
+      var robotMoves    = [];
+      var currentPlayer = HUMAN;
+      var gameOver      = false;
+      var totalMoves    = 0;
+      var robotTimer    = null;
+      var difficulty    = getSelectedDifficulty();
+      var scores        = { human: 0, draw: 0, robot: 0 };
 
-      difficultyInputs.forEach((input) =>
-        input.addEventListener("change", () => {
+      difficultyInputs.forEach(function(input) {
+        input.addEventListener("change", function() {
           difficulty = getSelectedDifficulty();
-          messageEl.textContent = `Difficulty set to ${capitalize(
-            difficulty
-          )}. Starting a fresh round.`;
+          setMessage(
+            "Difficulty set to " + capitalize(difficulty) + ". Starting a fresh round.",
+            ""
+          );
           startNewGame(true, true);
-        })
-      );
+        });
+      });
 
-      cells.forEach((cell) =>
-        cell.addEventListener("click", () =>
-          handleHumanMove(Number(cell.dataset.index))
-        )
-      );
+      cells.forEach(function(cell) {
+        cell.addEventListener("click", function() {
+          handleHumanMove(Number(cell.dataset.index));
+        });
+      });
 
-      resetBtn.addEventListener("click", () => startNewGame(true));
+      resetBtn.addEventListener("click", function() { startNewGame(true); });
 
-      function startNewGame(resetStatus, keepExistingMessage = false) {
-        board = Array(9).fill(null);
-        gameOver = false;
-        cells.forEach((cell, idx) => {
-          cell.textContent = "";
-          cell.disabled = false;
-          cell.className = "cell";
-          cell.setAttribute("aria-label", `Cell ${idx + 1}`);
+      resetScoresBtn.addEventListener("click", function() {
+        scores = { human: 0, draw: 0, robot: 0 };
+        updateScoreDisplay();
+      });
+
+      function startNewGame(resetStatus, keepExistingMessage) {
+        if (robotTimer !== null) { clearTimeout(robotTimer); robotTimer = null; }
+
+        board      = Array(9).fill(null);
+        humanMoves = [];
+        robotMoves = [];
+        totalMoves = 0;
+        gameOver   = false;
+
+        cells.forEach(function(cell, idx) {
+          cell.style.animation = "";
+          cell.style.opacity   = "";
+          cell.textContent     = "";
+          cell.disabled        = false;
+          cell.className       = "cell";
+          cell.setAttribute("aria-label", "Cell " + (idx + 1));
         });
 
         currentPlayer = Math.random() > 0.5 ? ROBOT : HUMAN;
-        updateStatus(
-          resetStatus
-            ? currentPlayer === HUMAN
-              ? "Your move first."
-              : "Robot starts this round."
-            : undefined
-        );
-        messageEl.textContent = keepExistingMessage
-          ? messageEl.textContent
-          : baseMessage;
+
+        if (resetStatus) {
+          updateStatus(
+            currentPlayer === HUMAN ? "Your move first." : "Robot starts this round."
+          );
+        }
+
+        if (!keepExistingMessage) {
+          setMessage(
+            "First to align three wins. Each player keeps only their last 3 marks.",
+            "The dashed mark will be removed when you place your next mark."
+          );
+        }
 
         if (currentPlayer === ROBOT) {
-          setTimeout(robotMove, 420);
+          robotTimer = setTimeout(robotMove, ROBOT_DELAY);
         }
       }
 
       function getSelectedDifficulty() {
-        const selected = difficultyInputs.find((input) => input.checked);
+        var selected = difficultyInputs.find(function(input) { return input.checked; });
         return selected ? selected.value : "medium";
       }
 
@@ -444,12 +568,13 @@
         if (handleAfterMove()) return;
         currentPlayer = ROBOT;
         updateStatus();
-        setTimeout(robotMove, 420);
+        robotTimer = setTimeout(robotMove, ROBOT_DELAY);
       }
 
       function robotMove() {
+        robotTimer = null;
         if (gameOver || currentPlayer !== ROBOT) return;
-        const move = pickMove();
+        var move = pickMove();
         if (move === null) return;
         placeMark(move, ROBOT);
         if (handleAfterMove()) return;
@@ -459,30 +584,61 @@
 
       function placeMark(index, player) {
         board[index] = player;
-        const cell = cells[index];
+        var cell = cells[index];
         cell.textContent = player;
-        cell.classList.add(player === HUMAN ? "cell--human" : "cell--robot");
+        cell.classList.add(player === HUMAN ? "cell--human" : "cell--robot", "cell--appear");
         cell.disabled = true;
+        cell.setAttribute(
+          "aria-label",
+          "Cell " + (index + 1) + ": " + (player === HUMAN ? "X (you)" : "O (robot)")
+        );
+
+        var history = player === HUMAN ? humanMoves : robotMoves;
+        history.push(index);
+
+        if (history.length > MAX_MARKS) {
+          var oldestIdx = history.shift();
+          board[oldestIdx] = null;
+          var oldCell = cells[oldestIdx];
+          oldCell.classList.add("cell--vanish");
+          (function(oi, oc) {
+            setTimeout(function() {
+              if (gameOver) return;
+              oc.style.animation = "";
+              oc.style.opacity   = "";
+              oc.textContent     = "";
+              oc.className       = "cell";
+              oc.disabled        = false;
+              oc.setAttribute("aria-label", "Cell " + (oi + 1));
+              updateOldestIndicators();
+            }, 220);
+          }(oldestIdx, oldCell));
+        }
+
+        totalMoves++;
+        updateOldestIndicators();
+        setTimeout(function() { cell.classList.remove("cell--appear"); }, 300);
+      }
+
+      function updateOldestIndicators() {
+        cells.forEach(function(c) { c.classList.remove("cell--oldest"); });
+        if (humanMoves.length === MAX_MARKS) cells[humanMoves[0]].classList.add("cell--oldest");
+        if (robotMoves.length === MAX_MARKS) cells[robotMoves[0]].classList.add("cell--oldest");
       }
 
       function handleAfterMove() {
-        const winner = findWinner();
-        if (winner) {
-          finishGame(winner.player, winner.line);
-          return true;
-        }
-        if (board.every(Boolean)) {
-          finishDraw();
-          return true;
-        }
+        var winner = findWinner();
+        if (winner) { finishGame(winner.player, winner.line); return true; }
+        if (totalMoves >= MAX_MOVES) { finishDraw(); return true; }
         return false;
       }
 
-      function findWinner(state = board) {
-        for (const line of winningLines) {
-          const [a, b, c] = line;
+      function findWinner(state) {
+        state = state || board;
+        for (var i = 0; i < winningLines.length; i++) {
+          var a = winningLines[i][0], b = winningLines[i][1], c = winningLines[i][2];
           if (state[a] && state[a] === state[b] && state[a] === state[c]) {
-            return { player: state[a], line };
+            return { player: state[a], line: winningLines[i] };
           }
         }
         return null;
@@ -490,12 +646,28 @@
 
       function finishGame(player, line) {
         gameOver = true;
-        const winnerText = player === HUMAN ? "You win!" : "Robot wins.";
-        updateStatus(winnerText);
-        messageEl.textContent = `${winnerText} Press “New Game” to play again.`;
+        var isHuman    = player === HUMAN;
+        var emoji      = isHuman ? "🎉" : "🤖";
+        var winnerText = isHuman ? "You win!" : "Robot wins.";
 
-        cells.forEach((cell, idx) => {
-          cell.disabled = true;
+        updateStatus(emoji + " " + winnerText, isHuman ? "human" : "robot");
+
+        if (isHuman) {
+          scores.human++;
+          setMessage("Excellent! You aligned three. Press “New Game” to continue.", "");
+        } else {
+          scores.robot++;
+          setMessage("The robot got three in a row. Press “New Game” to try again.", "");
+        }
+
+        bumpScore(isHuman ? "human" : "robot");
+        updateScoreDisplay();
+
+        cells.forEach(function(cell, idx) {
+          cell.style.animation = "";
+          cell.style.opacity   = "";
+          cell.disabled        = true;
+          cell.classList.remove("cell--oldest", "cell--appear", "cell--vanish");
           if (line.includes(idx)) {
             cell.classList.add("cell--win");
           } else {
@@ -507,38 +679,68 @@
 
       function finishDraw() {
         gameOver = true;
-        updateStatus("It's a draw.");
-        messageEl.textContent = "Nobody found a line. Try again!";
+        scores.draw++;
+        bumpScore("draw");
+        updateScoreDisplay();
+        updateStatus("It's a draw.", "draw");
+        setMessage("No winner after " + MAX_MOVES + " moves — try again!", "");
       }
 
-      function updateStatus(explicitText) {
-        if (explicitText) {
-          statusEl.textContent = explicitText;
+      function updateStatus(explicitText, type) {
+        if (explicitText !== undefined) {
+          statusText.textContent     = explicitText;
+          statusDot.className        = "status-dot";
+          statusDot.style.background =
+            type === "robot" ? "var(--robot)" :
+            type === "human" ? "var(--human)" :
+            type === "draw"  ? "var(--muted)" :
+                               "var(--accent)";
           return;
         }
-        statusEl.textContent =
-          currentPlayer === HUMAN ? "Your turn — tap a cell." : "Robot thinking…";
+        if (currentPlayer === HUMAN) {
+          statusText.textContent     = "Your turn — tap a cell.";
+          statusDot.className        = "status-dot";
+          statusDot.style.background = "var(--human)";
+        } else {
+          statusText.textContent     = "Robot thinking…";
+          statusDot.className        = "status-dot thinking";
+          statusDot.style.background = "var(--robot)";
+        }
+      }
+
+      function setMessage(main, hint) {
+        messageMain.textContent   = main;
+        messageHint.textContent   = hint;
+        messageHint.style.display = hint ? "block" : "none";
+      }
+
+      function updateScoreDisplay() {
+        scoreHumanEl.textContent = scores.human;
+        scoreDrawEl.textContent  = scores.draw;
+        scoreRobotEl.textContent = scores.robot;
+      }
+
+      function bumpScore(type) {
+        var el = type === "human" ? scoreHumanEl :
+                 type === "robot" ? scoreRobotEl  : scoreDrawEl;
+        el.classList.remove("score-bump");
+        void el.offsetWidth;
+        el.classList.add("score-bump");
       }
 
       function pickMove() {
-        const available = getAvailableMoves(board);
+        var available = getAvailableMoves(board);
         if (!available.length) return null;
-
-        if (difficulty === "easy") {
-          return pickRandom(available);
-        }
-        if (difficulty === "medium") {
-          return pickMediumMove(available);
-        }
+        if (difficulty === "easy")   return pickRandom(available);
+        if (difficulty === "medium") return pickMediumMove(available);
         return pickHardMove();
       }
 
       function getAvailableMoves(state) {
-        const moves = [];
-        for (let i = 0; i < state.length; i++) {
-          if (!state[i]) moves.push(i);
-        }
-        return moves;
+        return state.reduce(function(acc, val, idx) {
+          if (!val) acc.push(idx);
+          return acc;
+        }, []);
       }
 
       function pickRandom(options) {
@@ -546,72 +748,62 @@
       }
 
       function pickMediumMove(available) {
-        const winningMove = findCriticalMove(ROBOT);
-        if (winningMove !== null) return winningMove;
-        const blockMove = findCriticalMove(HUMAN);
-        if (blockMove !== null) return blockMove;
-
+        var win   = findCriticalMove(ROBOT);
+        if (win   !== null) return win;
+        var block = findCriticalMove(HUMAN);
+        if (block !== null) return block;
         if (board[4] === null) return 4;
-
-        const corners = [0, 2, 6, 8].filter((idx) => board[idx] === null);
+        var corners = [0, 2, 6, 8].filter(function(idx) { return board[idx] === null; });
         if (corners.length) return pickRandom(corners);
-
         return pickRandom(available);
       }
 
       function findCriticalMove(player) {
-        for (const line of winningLines) {
-          const [a, b, c] = line;
-          const values = [board[a], board[b], board[c]];
-          const owned = values.filter((v) => v === player).length;
-          const emptyIndex = line.find((index) => board[index] === null);
-          if (owned === 2 && emptyIndex !== undefined) {
-            return emptyIndex;
-          }
+        for (var i = 0; i < winningLines.length; i++) {
+          var a = winningLines[i][0], b = winningLines[i][1], c = winningLines[i][2];
+          var values = [board[a], board[b], board[c]];
+          var owned  = values.filter(function(v) { return v === player; }).length;
+          var emptyIndex = winningLines[i].find(function(index) { return board[index] === null; });
+          if (owned === 2 && emptyIndex !== undefined) return emptyIndex;
         }
         return null;
       }
 
       function pickHardMove() {
-        const available = getAvailableMoves(board);
-        let bestScore = -Infinity;
-        let move = available[0];
-
-        for (const idx of available) {
+        var available = getAvailableMoves(board);
+        var bestScore = -Infinity;
+        var move = available[0];
+        for (var i = 0; i < available.length; i++) {
+          var idx = available[i];
           board[idx] = ROBOT;
-          const score = minimax(board, 0, false);
+          var score = minimax(board, 0, false);
           board[idx] = null;
-          if (score > bestScore) {
-            bestScore = score;
-            move = idx;
-          }
+          if (score > bestScore) { bestScore = score; move = idx; }
         }
         return move;
       }
 
       function minimax(state, depth, isMaximizing) {
-        const winner = findWinner(state);
-        if (winner) {
-          return winner.player === ROBOT ? 10 - depth : depth - 10;
-        }
-        const available = getAvailableMoves(state);
-        if (!available.length) return 0;
+        var winner = findWinner(state);
+        if (winner) return winner.player === ROBOT ? 10 - depth : depth - 10;
+        var available = getAvailableMoves(state);
+        if (!available.length || depth >= 7) return 0;
 
         if (isMaximizing) {
-          let best = -Infinity;
-          for (const idx of available) {
-            state[idx] = ROBOT;
+          var best = -Infinity;
+          for (var i = 0; i < available.length; i++) {
+            state[available[i]] = ROBOT;
             best = Math.max(best, minimax(state, depth + 1, false));
-            state[idx] = null;
+            state[available[i]] = null;
           }
           return best;
         }
 
-        let best = Infinity;
-        for (const idx of available) {
-          state[idx] = HUMAN;
+        var best = Infinity;
+        for (var j = 0; j < available.length; j++) {
+          state[available[j]] = HUMAN;
           best = Math.min(best, minimax(state, depth + 1, true));
-          state[idx] = null;
+          state[available[j]] = null;
         }
         return best;
       }
